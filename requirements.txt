@@ -1,0 +1,8 @@
+scanpy
+anndata
+scikit-learn
+numpy
+scipy
+pandas
+h5py
+cellxgene-census
