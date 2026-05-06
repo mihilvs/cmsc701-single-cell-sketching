@@ -1,0 +1,20 @@
+
+--- Initializing Evaluation Harness ---
+Loading exact baseline clusters...
+Loading sketched out-of-core matrix...
+
+--- Computing Sketched Clusters ---
+
+--- Computing kNN Geometric Overlap ---
+Extracting exact top-15 neighbors (this may take a moment)...
+Extracting sketched top-15 neighbors...
+
+========================================
+          FINAL GRADE REPORT
+========================================
+Cells Processed:   100000
+Sketch Dimension:  800 (Target $k$)
+Clustering ARI:    0.7820  (1.0 is a perfect match)
+kNN Overlap:       57.62% (100% is perfect geometry)
+========================================
+

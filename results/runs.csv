@@ -1,0 +1,7 @@
+dataset,method,k,ari,knn_overlap_pct,sketch_seconds,eval_seconds
+pbmc3k,srp,50,0.271324,7.1457,0.6889,4.1700
+pbmc3k,dense_rp,50,0.279546,7.5951,0.7048,4.1827
+pbmc3k,srp,200,0.448134,22.5062,0.7063,4.1389
+pbmc3k,dense_rp,200,0.462058,22.7259,0.7143,4.1548
+pbmc3k,srp,800,0.515027,47.2691,0.7512,4.3103
+pbmc3k,dense_rp,800,0.542856,48.4123,0.7628,4.2958
