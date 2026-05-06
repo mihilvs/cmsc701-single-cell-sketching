@@ -1,0 +1,8 @@
+dataset,method,k,ari,knn_overlap_pct,sketch_seconds,eval_seconds
+allen_brain_100k,srp,50,0.552933,9.6643,1.0000,1022.6314
+allen_brain_100k,dense_rp,50,0.505568,9.6792,1.0000,1032.8351
+allen_brain_100k,srp,200,0.653726,30.6803,2.0000,1040.0106
+allen_brain_100k,dense_rp,200,0.647127,31.4219,3.0000,1037.7719
+allen_brain_100k,srp,800,0.741294,57.0517,4.0000,1080.8929
+allen_brain_100k,dense_rp,800,0.7820,57.6200,4.0000,1139.9914
+allen_brain_100k,dense_rp,800,0.781992,57.6212,8.0000,1133.3810

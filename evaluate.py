@@ -33,7 +33,14 @@ def evaluate_pipeline(exact_h5ad, sketch_h5, baseline_csv):
     
     # Compute neighbors and cluster directly on the sketch (no PCA needed)
     sc.pp.neighbors(adata_sketch, n_neighbors=15, use_rep='X')
-    sc.tl.leiden(adata_sketch, resolution=1.0, key_added='sketch_leiden')
+    sc.tl.leiden(
+        adata_sketch,
+        resolution=1.0,
+        key_added='sketch_leiden',
+        flavor='igraph',
+        n_iterations=2,
+        directed=False,
+    )
     
     sketch_clusters = adata_sketch.obs['sketch_leiden'].values
     
