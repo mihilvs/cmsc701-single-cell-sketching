@@ -4,9 +4,37 @@ import h5py
 import numpy as np
 import anndata as ad
 import scipy.sparse as sp
-from sklearn.random_projection import SparseRandomProjection
+from sklearn.random_projection import GaussianRandomProjection, SparseRandomProjection
 
-def run_sketching(input_path, output_dir, sketch_dim, chunk_size):
+
+def sketch_h5_filename(
+    input_path: str,
+    sketch_dim: int,
+    random_state: int = 42,
+    mode: str = "sparse",
+) -> str:
+    """
+    Basename of the sketched HDF5 file. Seed 42 keeps the legacy name (no _rs suffix);
+    other seeds append _rs{seed} so runs do not overwrite each other.
+    """
+    base = os.path.basename(input_path)
+    suf = "_preprocessed.h5ad"
+    if not base.endswith(suf):
+        raise ValueError(f"Expected input path ending with {suf!r}, got {input_path!r}")
+    prefix = base[: -len(suf)]
+    rs_part = "" if random_state == 42 else f"_rs{random_state}"
+    dense_part = "_dense" if mode == "dense" else ""
+    return f"{prefix}_sketched{dense_part}_k{sketch_dim}{rs_part}.h5"
+
+
+def run_sketching(
+    input_path,
+    output_dir,
+    sketch_dim,
+    chunk_size,
+    random_state: int = 42,
+    mode: str = "sparse",
+):
     """
     Executes an out-of-core Sparse Random Projection on a high-dimensional scRNA-seq matrix.
     """
@@ -24,13 +52,22 @@ def run_sketching(input_path, output_dir, sketch_dim, chunk_size):
     n_cells, n_genes = adata.shape
     print(f"Dataset detected: {n_cells} cells x {n_genes} genes.")
     print(f"Target sketch dimension (k): {sketch_dim}")
+    print(f"Projection mode: {mode}")
+    print(f"random_state: {random_state}")
     print(f"Processing in blocks of: {chunk_size} cells")
 
-    # 2. Generating the Achlioptas Matrix
-    print("\n--- Constructing Sparse Projection Matrix ---")
-    # density='auto' defaults to the standard Achlioptas optimal density (1/sqrt(n_features) or 1/3)
-    # We fix the random_state so your experiments are reproducible.
-    projector = SparseRandomProjection(n_components=sketch_dim, density='auto', random_state=42)
+    if mode == "sparse":
+        print("\n--- Constructing Sparse Projection Matrix ---")
+        projector = SparseRandomProjection(
+            n_components=sketch_dim, density="auto", random_state=random_state
+        )
+    elif mode == "dense":
+        print("\n--- Constructing Dense Gaussian Projection Matrix ---")
+        projector = GaussianRandomProjection(
+            n_components=sketch_dim, random_state=random_state
+        )
+    else:
+        raise ValueError(f"Unknown mode {mode!r}; use 'sparse' or 'dense'.")
     
     # The projector needs to know the feature dimension (n_genes) to build the matrix.
     # We fit it on a dummy sparse row of zeros to instantiate the matrix R without loading real data.
@@ -40,7 +77,7 @@ def run_sketching(input_path, output_dir, sketch_dim, chunk_size):
 
     # 3. Preparing the Output Sink
     os.makedirs(output_dir, exist_ok=True)
-    output_filename = os.path.basename(input_path).replace("_preprocessed.h5ad", f"_sketched_k{sketch_dim}.h5")
+    output_filename = sketch_h5_filename(input_path, sketch_dim, random_state, mode=mode)
     output_path = os.path.join(output_dir, output_filename)
     
     print(f"\n--- Starting Block-wise Projection ---")
@@ -96,6 +133,26 @@ if __name__ == "__main__":
         default=1000, 
         help="Number of cells to load into memory per block."
     )
-    
+    parser.add_argument(
+        "--random_state",
+        type=int,
+        default=42,
+        help="RNG seed for projection (default 42; other seeds add _rs<seed> to output filename).",
+    )
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="sparse",
+        choices=["sparse", "dense"],
+        help="sparse: SparseRandomProjection (SRP); dense: GaussianRandomProjection.",
+    )
+
     args = parser.parse_args()
-    run_sketching(args.input, args.output_dir, args.sketch_dim, args.chunk_size)
+    run_sketching(
+        args.input,
+        args.output_dir,
+        args.sketch_dim,
+        args.chunk_size,
+        random_state=args.random_state,
+        mode=args.mode,
+    )

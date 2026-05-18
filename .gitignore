@@ -1,4 +1,34 @@
-data/
-raw_data/
-sc_env/
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.sc_env/
+.venv/
+.venv*/
+venv/
+env/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+.mplconfig/
+
+# Large binaries (regenerate locally)
+/data/
+/raw_data/
+/runs/**/data/
+/expression_matrix.hdf5
+*.h5ad
+*.h5
+
+# Committed experiment summaries
+!results/
+!results/**
+!runs/**/results/
+!runs/**/results/**

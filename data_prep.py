@@ -60,7 +60,6 @@ if __name__ == "__main__":
         "--dataset", 
         type=str, 
         default="pbmc3k", 
-        # THE FIX: Added 'allen_brain' to the allowed choices here
         choices=["pbmc3k", "pbmc68k_reduced", "allen_brain"],
         help="The name of the dataset to load and preprocess."
     )
